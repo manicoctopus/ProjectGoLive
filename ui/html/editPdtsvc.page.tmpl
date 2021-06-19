@@ -1,0 +1,57 @@
+{{template "base" .}}
+
+{{define "title"}}Update Pdtsvc{{end}}
+
+{{define "body"}}
+<form action='/pdtsvc/update' method='POST'>
+    <div>
+        <label>Pdtsvc ID:</label>
+        {{if .Form}}
+            {{with .Form.Errors.Get "ID"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='id' value='{{.Form.Get "id"}}' readonly>
+        {{else if .Pdtsvc}}
+            <input type='text' name='id' value='{{.Pdtsvc.ID}}' readonly>
+        {{end}}
+    </div>
+    <div>
+        <label>Pdtsvc Code:</label>
+        {{if .Form}}
+            {{with .Form.Errors.Get "code"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='code' value='{{.Form.Get "code"}}'>
+        {{else if .Pdtsvc}}
+            <input type='text' name='code' value='{{.Pdtsvc.Code}}'>
+        {{end}}
+    </div>
+    <div>
+        <label>Pdtsvc Name:</label>
+        {{if .Form}}
+            {{with .Form.Errors.Get "name"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='name' value='{{.Form.Get "name"}}'>
+        {{else if .Pdtsvc}}
+            <input type='text' name='name' value='{{.Pdtsvc.Name}}'>
+        {{end}}
+    </div>
+    <div>
+        <label>Pdtsvc Description:</label>
+        {{if .Form}}
+            {{with .Form.Errors.Get "description"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='description' value='{{.Form.Get "description"}}'>
+        {{else if .Pdtsvc}}
+            <input type='text' name='description' value='{{.Pdtsvc.Description}}'>
+        {{end}}
+    </div>
+    <div align='right'>
+        <input type='submit' value='Edit Pdtsvc'>
+        <input type='reset' value='Reset Values'>
+        <input type='button' value='Go Back' onclick='history.back()'>
+    </div>
+</form>
+{{end}}

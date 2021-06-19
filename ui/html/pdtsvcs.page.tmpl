@@ -1,0 +1,37 @@
+{{template "base" .}}
+
+{{define "title"}}Pdtsvcs{{end}}
+
+{{define "body"}}
+    <h2>Pdtsvcs</h2>
+    {{if .Pdtsvcs}}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+        {{range .Pdtsvcs}}
+        <tr>
+            <td><a href='/course/{{.ID}}'>{{.ID}}</a></td>
+            <td>{{.Code}}</td>
+            <td>{{.Name}}</td>
+            <td>{{.Description}}</td>
+        </tr>
+        {{end}}
+        <tr>
+            <td colspan='4' align='right'>
+                <input type='button' value='Add Pdtsvc' onClick="location.href='../pdtsvc/addForm'">
+                <input type='button' value='Go Back' onclick='history.back()'>
+            </td>
+        </tr>
+    </table>
+    {{else}}
+        <p>There are no products or services yet!</p>
+        <div align='right'>
+            <input type='button' value='Add Pdtsvc' onClick="location.href='../pdtsvc/addForm'">
+            <input type='button' value='Go Back' onclick='history.back()'>
+        </div>
+    {{end}}
+{{end}}
