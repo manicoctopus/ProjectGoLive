@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -20,20 +21,41 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	pdtsvcs  interface {
-		Create(*models.Pdtsvc) (int, error)
-		Update(*models.Pdtsvc) error
-		Delete(int) error
-		Retrieve(int) (*models.Pdtsvc, error)
-		RetrieveAll() ([]*models.Pdtsvc, error)
-	}
-	users interface {
+	users    interface {
 		Create(*models.User) (int, error)
 		Update(*models.User) error
-		Delete(int) error
-		Retrieve(int) (*models.User, error)
+		Delete(uint32) error
+		Retrieve(uint32) (*models.User, error)
 		RetrieveAll() ([]*models.User, error)
 		AuthenticateUser(string, string) (int, error)
+	}
+	pdtsvcs interface {
+		Create(*models.Pdtsvc) (int, error)
+		Update(*models.Pdtsvc) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Pdtsvc, error)
+		RetrieveAll() ([]*models.Pdtsvc, error)
+	}
+	listings interface {
+		Create(*models.Listing) (int, error)
+		Update(*models.Listing) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Listing, error)
+		RetrieveAll() ([]*models.Listing, error)
+	}
+	reviews interface {
+		Create(*models.Review) (int, error)
+		Update(*models.Review) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Review, error)
+		RetrieveAll() ([]*models.Review, error)
+	}
+	categories interface {
+		Create(*models.Category) (int, error)
+		Update(*models.Category) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Category, error)
+		RetrieveAll() ([]*models.Category, error)
 	}
 }
 
@@ -41,13 +63,22 @@ var (
 	app *application
 )
 
-func loadEnv(envFilename string) (*string, *string, tls.Certificate, []byte) {
+func loadEnv(envFilename string) (*string, *string, *string, *string, *string, tls.Certificate, []byte) {
 	if err := godotenv.Load(envFilename); err != nil {
 		app.errorLog.Fatal("ERROR loading .env file")
 	}
 
-	conn := os.Getenv("CONN_HOST") + ":" + os.Getenv("CONN_PORT")
+	conn := os.Getenv("CONN_HOST")
 	addr := &conn
+
+	portString := os.Getenv("CONN_PORT")
+	port := &portString
+
+	sslString := os.Getenv("SSL")
+	ssl := &sslString
+
+	sslPortString := os.Getenv("SSL_CONN_PORT")
+	sslPort := &sslPortString
 
 	dsnString := os.Getenv("DSN")
 	dsn := &dsnString
@@ -63,7 +94,7 @@ func loadEnv(envFilename string) (*string, *string, tls.Certificate, []byte) {
 		app.errorLog.Fatalf("ERROR ca certificate: %s", err)
 	}
 
-	return addr, dsn, cert, caCert
+	return addr, port, ssl, sslPort, dsn, cert, caCert
 }
 
 func openDB(dsn string) (*sql.DB, error) {
@@ -86,7 +117,7 @@ func main() {
 		infoLog:  infoLog,
 	}
 
-	addr, dsn, cert, caCert := loadEnv("apiserver.env")
+	addr, port, ssl, sslPort, dsn, cert, caCert := loadEnv("apiserver.env")
 
 	db, err := openDB(*dsn)
 	if err != nil {
@@ -94,8 +125,11 @@ func main() {
 	}
 	defer db.Close()
 
-	app.pdtsvcs = &mysql.PdtsvcModel{DB: db}
 	app.users = &mysql.UserModel{DB: db}
+	app.pdtsvcs = &mysql.PdtsvcModel{DB: db}
+	app.listings = &mysql.ListingModel{DB: db}
+	app.reviews = &mysql.ReviewModel{DB: db}
+	app.categories = &mysql.CategoryModel{DB: db}
 
 	caCertPool := x509.NewCertPool()
 	caCertPool.AppendCertsFromPEM(caCert)
@@ -111,7 +145,7 @@ func main() {
 
 	// Initialize a new http.Server struct.
 	srv := &http.Server{
-		Addr:         *addr,
+		Addr:         *addr + ":" + *sslPort,
 		ErrorLog:     app.errorLog,
 		Handler:      app.routes(),
 		TLSConfig:    tlsConfig,
@@ -122,9 +156,36 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	app.infoLog.Printf("INFO starting api server @ %s\n", srv.Addr)
-	if err := srv.ListenAndServeTLS("", ""); err != nil {
-		app.errorLog.Fatal("ERROR starting api server :: ", err)
-		return
+	if *ssl == "true" {
+		app.infoLog.Printf("INFO starting https api server @ %s\n", srv.Addr)
+		if err := srv.ListenAndServeTLS("", ""); err != nil {
+			app.errorLog.Fatal("ERROR starting https api server :: ", err)
+			return
+		}
+
+		httpSrv := &http.Server{
+			Addr: *addr + ":" + *port,
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				host, _, _ := net.SplitHostPort(r.Host)
+				u := r.URL
+				u.Host = net.JoinHostPort(host, *sslPort)
+				u.Scheme = "https"
+				log.Println(u.String())
+				http.Redirect(w, r, u.String(), http.StatusMovedPermanently)
+			}),
+			IdleTimeout:  time.Minute,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+		}
+		// Start the HTTP server and redirect all incoming connections to HTTPS
+		go httpSrv.ListenAndServe()
+
+	} else if *ssl == "false" {
+		srv.Addr = *addr + ":" + *port
+		app.infoLog.Printf("INFO starting http api server @ %s\n", srv.Addr)
+		if err := srv.ListenAndServe(); err != nil {
+			app.errorLog.Fatal("ERROR starting http api server :: ", err)
+			return
+		}
 	}
 }
