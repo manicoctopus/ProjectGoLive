@@ -20,20 +20,41 @@ import (
 type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
-	pdtsvcs  interface {
-		Create(*models.Pdtsvc) (int, error)
-		Update(*models.Pdtsvc) error
-		Delete(int) error
-		Retrieve(int) (*models.Pdtsvc, error)
-		RetrieveAll() ([]*models.Pdtsvc, error)
-	}
-	users interface {
+	users    interface {
 		Create(*models.User) (int, error)
 		Update(*models.User) error
-		Delete(int) error
-		Retrieve(int) (*models.User, error)
+		Delete(uint32) error
+		Retrieve(uint32) (*models.User, error)
 		RetrieveAll() ([]*models.User, error)
 		AuthenticateUser(string, string) (int, error)
+	}
+	pdtsvcs interface {
+		Create(*models.Pdtsvc) (int, error)
+		Update(*models.Pdtsvc) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Pdtsvc, error)
+		RetrieveAll() ([]*models.Pdtsvc, error)
+	}
+	listings interface {
+		Create(*models.Listing) (int, error)
+		Update(*models.Listing) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Listing, error)
+		RetrieveAll() ([]*models.Listing, error)
+	}
+	reviews interface {
+		Create(*models.Review) (int, error)
+		Update(*models.Review) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Review, error)
+		RetrieveAll() ([]*models.Review, error)
+	}
+	categories interface {
+		Create(*models.Category) (int, error)
+		Update(*models.Category) error
+		Delete(uint32) error
+		Retrieve(uint32) (*models.Category, error)
+		RetrieveAll() ([]*models.Category, error)
 	}
 }
 
