@@ -13,3 +13,23 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+tls/srvkey.pem
+tls/srvcert.pem
+tls/ckey.pem
+tls/ccert.pem
+
+cmd/frontend/middleware.go
+
+cmd/backend/Readme.txt
+batch.txt
+
+pkg/models/mysql/user.sql
+pkg/models/mysql/listing.sql
+pkg/models/mysql/pdtsvc.sql
+pkg/models/mysql/review.sql
+pkg/models/mysql/category.sql
+pkg/models/mysql/proj_db.sql
+
+apiserver.env
+
+.gitignore
