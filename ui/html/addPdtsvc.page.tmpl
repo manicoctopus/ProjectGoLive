@@ -1,0 +1,36 @@
+{{template "base" .}}
+
+{{define "title"}}Create a New Pdtsvc{{end}}
+
+{{define "body"}}
+<form action='/pdtsvc/create' method='POST'>
+    {{with .Form}}
+        <div>
+            <label>Pdtsvc Code:</label>
+            {{with .Errors.Get "code"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='code' value='{{.Get "code"}}'>
+        </div>
+        <div>
+            <label>Pdtsvc Name:</label>
+            {{with .Errors.Get "name"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='name' value='{{.Get "name"}}'>
+        </div>
+        <div>
+            <label>Pdtsvc Description:</label>
+            {{with .Errors.Get "description"}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' name='description' value='{{.Get "description"}}'>
+        </div>
+        <div align='right'>
+            <input type='submit' value='Add Pdtsvc'>
+            <input type='reset' value='Reset Values'>
+            <input type='button' value='Go Back' onclick='history.back()'>
+        </div>
+    {{end}}
+</form>
+{{end}}

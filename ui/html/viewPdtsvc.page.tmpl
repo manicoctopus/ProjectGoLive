@@ -1,0 +1,33 @@
+{{template "base" .}}
+
+{{define "title"}}View Pdtsvc{{end}}
+
+{{define "body"}}
+    {{if .Pdtsvc}}
+        {{with .Pdtsvc}}
+            <div>
+                <label>Pdtsvc ID:</label>
+                <input type='text' name='id' value='{{.ID}}' readonly>
+            </div>
+            <div>
+                <label>Member Code:</label>
+                <input type='text' name='code' value='{{.Code}}' readonly>
+            </div>
+            <div>
+                <label>Pdtsvc Name:</label>
+                <input type='text' name='Name' value='{{.Name}}' readonly>
+            </div>
+            <div>
+                <label>Pdtsvc Description:</label>
+                <input type='text' name='description' value='{{.Description}}' readonly>
+            </div>
+            <div align='right'>
+                <input type='button' value='Edit Pdtsvc' onClick="location.href='/pdtsvc/editForm/{{.ID}}'">
+                <input type='button' value='Delete Pdtsvc' onClick="location.href='/pdtsvc//delete/{{.ID}}'">
+                <input type='button' value='Go Back' onclick='history.back()'>
+            </div>
+        {{end}}
+    {{else}}
+        <p>There is no such course!</p>
+    {{end}}
+{{end}}
