@@ -13,9 +13,6 @@ var (
 	ErrDuplicateEmail = errors.New("models: duplicate email")
 )
 
-//var Category = []string{"Frozen Food", "Staples", "Meat and Seafood", "Beverages", "Fruit and Vegetables"}
-//var SortBy = []string{"Popular", "Highly Rated", "Price (Asc.)", "Price (Desc.)"}
-
 var MapOTP = make(map[string]string)
 
 type User struct {
@@ -42,7 +39,7 @@ type Listing struct {
 	Ig_url      string    `json:"ig_url"`
 	Fb_url      string    `json:"fb_url"`
 	Website_url string    `json:"website_url"`
-	UserID      uint32    `json:"id"`
+	UserID      uint32    `json:"userID"`
 	Created     time.Time `json:"created"`
 	Modified    time.Time `json:"modified"`
 }

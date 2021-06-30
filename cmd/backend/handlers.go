@@ -312,6 +312,25 @@ func (app *application) retrieveAllPdtsvcs(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+func (app *application) retrieveAllPdtsvcsByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	if id, err := strconv.Atoi(vars["id"]); err != nil {
+		app.errorLog.Print("ERROR occurred while decoding pdtsvc data :: ", err)
+		errMsg := &models.ErrorMsg{Name: "Invalid Pdtsvc ID", Description: "Unable to decipher Pdtsvc ID"}
+		json.NewEncoder(w).Encode(errMsg)
+		return
+	} else {
+		if pdtsvcs, err := app.pdtsvcs.RetrieveAllByID(uint32(id)); err != nil {
+			app.errorLog.Print("ERROR getting pdtsvcs :: ", err)
+			errMsg := &models.ErrorMsg{Name: "Pdtsvcs not found", Description: "Unable to retrieve Pdtsvcs from database"}
+			json.NewEncoder(w).Encode(errMsg)
+			return
+		} else {
+			json.NewEncoder(w).Encode(pdtsvcs)
+		}
+	}
+}
+
 func (app *application) createListing(w http.ResponseWriter, r *http.Request) {
 	listing := models.Listing{}
 	if err := json.NewDecoder(r.Body).Decode(&listing); err != nil {
@@ -601,6 +620,25 @@ func (app *application) retrieveAllReviews(w http.ResponseWriter, r *http.Reques
 		return
 	} else {
 		json.NewEncoder(w).Encode(reviews)
+	}
+}
+
+func (app *application) retrieveAllReviewsByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	if id, err := strconv.Atoi(vars["id"]); err != nil {
+		app.errorLog.Print("ERROR occurred while decoding pdtsvc data :: ", err)
+		errMsg := &models.ErrorMsg{Name: "Invalid Pdtsvc ID", Description: "Unable to decipher Pdtsvc ID"}
+		json.NewEncoder(w).Encode(errMsg)
+		return
+	} else {
+		if reviews, err := app.reviews.RetrieveAllByID(uint32(id)); err != nil {
+			app.errorLog.Print("ERROR getting reviews :: ", err)
+			errMsg := &models.ErrorMsg{Name: "Review not found", Description: "Unable to retrieve Reviews from database"}
+			json.NewEncoder(w).Encode(errMsg)
+			return
+		} else {
+			json.NewEncoder(w).Encode(reviews)
+		}
 	}
 }
 

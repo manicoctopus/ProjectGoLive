@@ -31,6 +31,8 @@ func (app *application) routes() http.Handler {
 	listings.HandleFunc("/delete", app.deleteListing).Methods("DELETE")
 	listings.HandleFunc("/{id}", app.retrieveListing).Methods("GET")
 	listings.HandleFunc("", app.retrieveAllListings).Methods("GET")
+	listings.HandleFunc("/pdtsvcs/{id}", app.retrieveAllPdtsvcsByID).Methods("GET")
+	listings.HandleFunc("/reviews/{id}", app.retrieveAllReviewsByID).Methods("GET")
 
 	reviews := router.PathPrefix("/api/v1/reviews").Subrouter()
 	reviews.HandleFunc("/create", app.createReview).Methods("POST")

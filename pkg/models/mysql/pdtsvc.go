@@ -113,14 +113,14 @@ func (m *PdtsvcModel) RetrieveAll() ([]*models.Pdtsvc, error) {
 	return products, nil
 }
 
-func (m *PdtsvcModel) GetSellerPdtsvcs(sellerID string) ([]*models.Pdtsvc, error) {
+func (m *PdtsvcModel) RetrieveAllByID(listID uint32) ([]*models.Pdtsvc, error) {
 	stmt := `SELECT 
-				 PdtsvcID, Name, Description, Price, CategoryID, 
-				 Inventory, Created, UserID, Rating, RatingNum, UnitSold
+				PdtsvcID, PdtsvcName, PdtsvcPrice, PdtsvcDesc, CatID, ListID, 
+				Views, Likes, Keyword, Created, Modified 
 			FROM pdtsvc
-			WHERE UserID=?`
+			WHERE ListID=?`
 
-	rows, err := m.DB.Query(stmt, sellerID)
+	rows, err := m.DB.Query(stmt, listID)
 	if err != nil {
 		return nil, err
 	}

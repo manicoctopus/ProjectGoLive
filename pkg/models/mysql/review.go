@@ -100,3 +100,27 @@ func (m *ReviewModel) RetrieveAll() ([]*models.Review, error) {
 	}
 	return reviews, nil
 }
+
+func (m *ReviewModel) RetrieveAllByID(listID uint32) ([]*models.Review, error) {
+	stmt :=
+		`SELECT 
+			ReviewID, ReviewText, UserID, ListID 
+		FROM review
+		WHERE ListID=?`
+
+	reviews := []*models.Review{}
+
+	rows, _ := m.DB.Query(stmt, listID)
+
+	for rows.Next() {
+		r := &models.Review{}
+		err := rows.Scan(
+			&r.ReviewID, &r.ReviewText, &r.UserID, &r.ListID,
+		)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, r)
+	}
+	return reviews, nil
+}

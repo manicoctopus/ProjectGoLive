@@ -35,6 +35,7 @@ type application struct {
 		Delete(uint32) error
 		Retrieve(uint32) (*models.Pdtsvc, error)
 		RetrieveAll() ([]*models.Pdtsvc, error)
+		RetrieveAllByID(uint32) ([]*models.Pdtsvc, error)
 	}
 	listings interface {
 		Create(*models.Listing) (int, error)
@@ -49,6 +50,7 @@ type application struct {
 		Delete(uint32) error
 		Retrieve(uint32) (*models.Review, error)
 		RetrieveAll() ([]*models.Review, error)
+		RetrieveAllByID(uint32) ([]*models.Review, error)
 	}
 	categories interface {
 		Create(*models.Category) (int, error)
